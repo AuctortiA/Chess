@@ -12,6 +12,13 @@ class Canvas:
         self.ranks = 8
         self.files = 8
 
+        self.square_rects = [[] for _ in range(self.files)]
+
+        for file in range(self.files):
+            for rank in range(self.ranks):
+                self.square_rects[file].append(pg.Rect(file * self.scale, rank * self.scale, self.scale, self.scale))
+
+
         # pieces 
         self.piece_imgs = {}
         piece_set = "cburnett"
@@ -27,6 +34,8 @@ class Canvas:
         for img in os.listdir(white_piece_path):
             add_pg_img (self.piece_imgs, img, white_piece_path, self.scale)
         
+        self.piece_names = self.piece_imgs.keys()
+
         
     def render(self, win):
         
@@ -44,17 +53,36 @@ class Canvas:
         for file in range(self.files):
             for rank in range(self.ranks):
                 colour = LIGHT_SQUARE if (rank + file) % 2 == 0 else DARK_SQUARE
-                pg.draw.rect(win, colour, pg.Rect(file * self.scale, rank * self.scale, self.scale, self.scale))
+                pg.draw.rect(win, colour, self.square_rects[file][rank])
 
     def render_pieces(self, win, fen):
-        for piece in fen:
-            pass
+        
+        file_num = 0
+        rank_num = 0
+
+        for char in fen:
+            if char in self.piece_names:
+                self.render_piece(win, file_num, rank_num, char)
+                file_num += 1
+
+            elif char.isdigit():
+                file_num += int(char)
+            
+            elif char == "/":
+                rank_num += 1
+                file_num = 0
+            
+            else:
+                break
+
+    def render_piece(self, win, file, rank, piece):
+        win.blit(self.piece_imgs[piece], self.square_rects[file][rank])
 
 
 def add_pg_img (_dict, img_name, path, scale):
     _dict.update(
                 {img_name[0]:   pg.transform.scale(
                                 pg.image.load(os.path.join(path, img_name)),
-                                ((22 * scale), (22 * scale)))
+                                ((scale), (scale)))
                 }
             )
