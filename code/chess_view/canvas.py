@@ -18,7 +18,6 @@ class Canvas:
             for rank in range(self.ranks):
                 self.square_rects[file].append(pg.Rect(file * self.scale, rank * self.scale, self.scale, self.scale))
 
-
         # pieces 
         self.piece_imgs = {}
         piece_set = "cburnett"
@@ -81,7 +80,7 @@ class Canvas:
 
 def add_pg_img (_dict, img_name, path, scale):
     _dict.update(
-                {img_name[0]:   pg.transform.scale(
+                {img_name[0]:   pg.transform.smoothscale(
                                 pg.image.load(os.path.join(path, img_name)),
                                 ((scale), (scale)))
                 }
