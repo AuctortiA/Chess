@@ -8,4 +8,4 @@ TestModel:
 	python -m unittest
 
 ChessMain:
-	python chess/main.py
+	python code/main.py
