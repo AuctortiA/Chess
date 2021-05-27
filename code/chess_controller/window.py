@@ -1,7 +1,7 @@
 import pygame as pg
 
 class Window: 
-    def __init__(self, model, canvas) -> None:
+    def __init__(self, model, canvas, scale) -> None:
         
         # modules
         self.model = model
@@ -13,7 +13,7 @@ class Window:
         self.quit = False
 
         # pygame objects
-        self.win = pg.display.set_mode((800, 800))
+        self.win = pg.display.set_mode((8 * scale, 8 * scale))
         pg.display.set_caption("Chess")
         
         self.clock = pg.time.Clock()

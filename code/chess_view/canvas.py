@@ -2,9 +2,9 @@ import pygame as pg
 import os
 
 class Canvas:
-    def __init__(self, model) -> None:
+    def __init__(self, model, scale) -> None:
         # pygame
-        self.scale = 100
+        self.scale = scale
 
         self.model = model 
 
