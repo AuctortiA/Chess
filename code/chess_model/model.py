@@ -59,7 +59,8 @@ class Model:
         old_rank, old_file = old
         piece = self.board[old_rank][old_file]
 
-        self.board [old_rank][old_file] = None
+        if piece.valid_move(old, new):
+            self.board [old_rank][old_file] = None
 
-        new_rank, new_file = new
-        self.board [new_rank][new_file] = piece
+            new_rank, new_file = new
+            self.board [new_rank][new_file] = piece
