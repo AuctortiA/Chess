@@ -59,6 +59,8 @@ class Canvas:
         if dragged_piece:
             d_rank, d_file = dragged_piece
 
+        dragged_char = None
+        
         for char in fen:
             if char in self.piece_names:
 
@@ -83,7 +85,7 @@ class Canvas:
             else:
                 break
             
-        if dragged_piece:
+        if dragged_char:
             self.render_piece (win, d_rank, file_num, dragged_char, dragged_pos)
 
     def render_piece(self, win, rank, file, piece, dragged_pos=None):
