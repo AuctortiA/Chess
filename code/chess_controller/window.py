@@ -14,6 +14,8 @@ class Window:
         self.fen = str(model) # get fen
         
         # window state
+        self.changes = True
+
         self.scale = scale
         self.piece_dragged = False
 
@@ -38,7 +40,8 @@ class Window:
                 self.quit = True
 
             elif event.type == pg.MOUSEBUTTONDOWN:
-                
+                self.changes = True
+
                 # get corresponding file/rank
                 if not self.piece_dragged:
                     x, y = pg.mouse.get_pos()
@@ -49,6 +52,7 @@ class Window:
                     self.piece_dragged = (rank, file)
 
             elif event.type == pg.MOUSEBUTTONUP:
+                self.changes = True
                 if self.piece_dragged:
                     x, y = pg.mouse.get_pos()
 
@@ -66,13 +70,16 @@ class Window:
         self.handle_events()
 
         # render
-        self.fen = str(self.model)
+        if self.changes or self.piece_dragged:
+            self.fen = str(self.model)
 
-        if self.piece_dragged:
-            pos = pg.mouse.get_pos()
-            self.canvas.render(self.win, self.fen, self.piece_dragged, pos)
-        else:
-            self.canvas.render(self.win, self.fen)
+            if self.piece_dragged:
+                pos = pg.mouse.get_pos()
+                self.canvas.render(self.win, self.fen, self.piece_dragged, pos)
+            else:
+                self.canvas.render(self.win, self.fen)
+        
+        self.changes = False
 
 
         # pygame objects
