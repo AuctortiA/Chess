@@ -56,15 +56,18 @@ class Canvas:
         rank_num = 0
         file_num = 0
 
+        if dragged_piece:
+            d_rank, d_file = dragged_piece
+
         for char in fen:
             if char in self.piece_names:
-                if dragged_piece:
-                    d_rank, d_file = dragged_piece
 
+                if dragged_piece:
                     if d_rank == rank_num and d_file == file_num:
-                        self.render_piece (win, rank_num, file_num, char, dragged_pos)
+                        dragged_char = char
                     else:
                         self.render_piece(win, rank_num, file_num, char)
+
                 else:
                     self.render_piece(win, rank_num, file_num, char)
 
@@ -79,6 +82,9 @@ class Canvas:
             
             else:
                 break
+            
+        if dragged_piece:
+            self.render_piece (win, d_rank, file_num, dragged_char, dragged_pos)
 
     def render_piece(self, win, rank, file, piece, dragged_pos=None):
         if dragged_pos:
