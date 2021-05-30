@@ -1,6 +1,7 @@
 from chess_model.pieces import King, Queen, Rook, Bishop, Knight, Pawn
 from chess_model.move import Move
 
+
 class Model:
     def __init__(self, fen) -> None:
         
@@ -77,6 +78,10 @@ class Model:
         if type(_move.old_piece) == Pawn:
             if not self.check_pawn_capture(_move):
                 return False
+            
+            if not self.check_pawn_two_square_rule(_move):
+                return False
+
             if not self.check_pawn_forward_move(_move):
                 return False
 
@@ -94,9 +99,21 @@ class Model:
     def check_pawn_capture(self, _move) -> bool:
         if abs(_move.rank_dif) == 1 and abs(_move.file_dif) == 1:
             return self.board[_move.new_rank][_move.new_file]
-
         return True
     
-    def check_pawn_forward_move(self, move) -> bool:
+    def check_pawn_two_square_rule(self, _move) -> bool:
+        if abs(_move.rank_dif) == 2:
+            if _move.old_rank == 1 or _move.old_rank == self.ranks - 2:
+                return True
+            else:
+                return False
+
+        return True
+
+    def check_pawn_forward_move(self, _move) -> bool:
+        
+        if 0 <= abs(_move.rank_dif) <= 2 and _move.file_dif == 0:
+            if _move.new_piece:
+                return False
         return True
 
