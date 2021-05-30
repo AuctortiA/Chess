@@ -61,6 +61,7 @@ class Bishop (Piece):
         rank_dif = old_rank - new_rank
         file_dif = old_file - new_file  
 
+        return abs(rank_dif) == abs(file_dif)
 
 class Knight (Piece):
     def __init__(self, code, file, rank) -> bool:
