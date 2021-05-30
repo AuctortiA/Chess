@@ -7,7 +7,7 @@ class Model:
         self.ranks = 8
         self.files = 8
 
-        self.board = [[[] for _ in range(self.files)] for _ in range (self.ranks)]
+        self.board = [[None for _ in range(self.files)] for _ in range (self.ranks)]
 
         self.fen_piece_codes = {"k": King, "q": Queen, "r": Rook, "b": Bishop, "n": Knight, "p": Pawn}
 
@@ -32,7 +32,7 @@ class Model:
             else:
                 break
 
-    def __str__ (self):
+    def __str__ (self) -> str:
         fen = ""
         empty_num = 0
 
@@ -55,7 +55,7 @@ class Model:
 
         return fen
 
-    def move(self, old, new):
+    def move(self, old, new) -> None:
         old_rank, old_file = old
         piece = self.board[old_rank][old_file]
         if piece:
