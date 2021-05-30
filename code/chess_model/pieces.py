@@ -44,7 +44,7 @@ class Queen (Piece):
             return True
 
         return abs(rank_dif) == abs(file_dif)
-        
+
 
 class Rook (Piece):
     def __init__(self, code, file, rank) -> bool:
@@ -111,10 +111,19 @@ class Pawn (Piece):
         rank_dif = old_rank - new_rank
         file_dif = old_file - new_file 
 
-        if 0 <= rank_dif <= 2 and file_dif == 0:
-            return True
+        if self.code.isupper():
+
+            if 0 <= rank_dif <= 2 and file_dif == 0:
+                return True
+            
+            if rank_dif == 1 and -1 <= file_dif <= 1:
+                return True
         
-        if rank_dif == 1 and -1 <= file_dif <= 1:
-            return True
+        else:
+            if -2 <= rank_dif <= 0 and file_dif == 0:
+                return True
+            
+            if rank_dif == -1 and -1 <= file_dif <= 1:
+                return True
 
         return False
