@@ -11,6 +11,8 @@ class Piece:
     def valid_move(self, old, new):
         return True
 
+    def get_colour (self):
+        return "w" if self.code.isupper() else "b"
 
 class King (Piece):
     def __init__(self, code, file, rank) -> bool:

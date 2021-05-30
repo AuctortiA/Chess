@@ -1,6 +1,7 @@
 import pygame as pg
 import os
 
+
 class Canvas:
     def __init__(self, scale) -> None:
         # pygame
@@ -60,7 +61,7 @@ class Canvas:
             d_rank, d_file = dragged_piece
 
         dragged_char = None
-        
+
         for char in fen:
             if char in self.piece_names:
 
