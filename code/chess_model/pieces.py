@@ -1,5 +1,5 @@
 class Piece:
-    def __init__(self, code, file, rank) -> None:
+    def __init__(self, code, file, rank) -> bool:
         self.code = code
 
         self.file = file
@@ -13,7 +13,7 @@ class Piece:
 
 
 class King (Piece):
-    def __init__(self, code, file, rank) -> None:
+    def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
     def valid_move(self, old, new):
@@ -27,7 +27,7 @@ class King (Piece):
         
 
 class Queen (Piece):
-    def __init__(self, code, file, rank) -> None:
+    def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
     def valid_move(self, old, new):
@@ -39,7 +39,7 @@ class Queen (Piece):
 
 
 class Rook (Piece):
-    def __init__(self, code, file, rank) -> None:
+    def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
     def valid_move(self, old, new):
@@ -51,7 +51,7 @@ class Rook (Piece):
 
 
 class Bishop (Piece): 
-    def __init__(self, code, file, rank) -> None:
+    def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
     def valid_move(self, old, new):
@@ -63,7 +63,7 @@ class Bishop (Piece):
 
 
 class Knight (Piece):
-    def __init__(self, code, file, rank) -> None:
+    def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
     def valid_move(self, old, new):
@@ -71,10 +71,17 @@ class Knight (Piece):
         new_rank, new_file = new
 
         rank_dif = old_rank - new_rank
-        file_dif = old_file - new_file 
+        file_dif = old_file - new_file
+
+        if abs(rank_dif) == 1 and abs(file_dif) == 2:
+            return True
+        
+        if abs(rank_dif) == 2 and abs(file_dif) == 1:
+            return True
+
 
 class Pawn (Piece):
-    def __init__(self, code, file, rank) -> None:
+    def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
     def valid_move(self, old, new):
