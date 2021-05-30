@@ -8,7 +8,7 @@ class Piece:
     def __str__(self):
         return self.code
 
-    def valid_move(self, old, new):
+    def valid_move(self, _move):
         return True
 
     def get_colour (self):
@@ -18,51 +18,33 @@ class King (Piece):
     def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
-    def valid_move(self, old, new):
-        old_rank, old_file = old
-        new_rank, new_file = new
-
-        rank_dif = old_rank - new_rank
-        file_dif = old_file - new_file 
-
-        return -1 <= rank_dif <= 1 and -1 <= file_dif <= 1
+    def valid_move(self, _move):
+        return -1 <= _move.rank_dif <= 1 and -1 <= _move.file_dif <= 1
         
 
 class Queen (Piece):
     def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
-    def valid_move(self, old, new):
-        old_rank, old_file = old
-        new_rank, new_file = new
-
-        rank_dif = old_rank - new_rank
-        file_dif = old_file - new_file 
-
-        if rank_dif != 0 and file_dif == 0:
+    def valid_move(self, _move):
+        if _move.rank_dif != 0 and _move.file_dif == 0:
             return True
         
-        if rank_dif == 0 and file_dif != 0:
+        if _move.rank_dif == 0 and _move.file_dif != 0:
             return True
 
-        return abs(rank_dif) == abs(file_dif)
+        return abs(_move.rank_dif) == abs(_move.file_dif)
 
 
 class Rook (Piece):
     def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
-    def valid_move(self, old, new):
-        old_rank, old_file = old
-        new_rank, new_file = new
-
-        rank_dif = old_rank - new_rank
-        file_dif = old_file - new_file 
-
-        if rank_dif != 0 and file_dif == 0:
+    def valid_move(self, _move):
+        if _move.rank_dif != 0 and _move.file_dif == 0:
             return True
         
-        if rank_dif == 0 and file_dif != 0:
+        if _move.rank_dif == 0 and _move.file_dif != 0:
             return True
         
         return False
@@ -72,31 +54,19 @@ class Bishop (Piece):
     def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
-    def valid_move(self, old, new):
-        old_rank, old_file = old
-        new_rank, new_file = new
-
-        rank_dif = old_rank - new_rank
-        file_dif = old_file - new_file  
-
-        return abs(rank_dif) == abs(file_dif)
+    def valid_move(self, _move):
+        return abs(_move.rank_dif) == abs(_move.file_dif)
 
 
 class Knight (Piece):
     def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
-    def valid_move(self, old, new):
-        old_rank, old_file = old
-        new_rank, new_file = new
-
-        rank_dif = old_rank - new_rank
-        file_dif = old_file - new_file
-
-        if abs(rank_dif) == 1 and abs(file_dif) == 2:
+    def valid_move(self, _move):
+        if abs(_move.rank_dif) == 1 and abs(_move.file_dif) == 2:
             return True
         
-        if abs(rank_dif) == 2 and abs(file_dif) == 1:
+        if abs(_move.rank_dif) == 2 and abs(_move.file_dif) == 1:
             return True
 
         return False
@@ -106,26 +76,20 @@ class Pawn (Piece):
     def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
-    def valid_move(self, old, new):
-        old_rank, old_file = old
-        new_rank, new_file = new
-
-        rank_dif = old_rank - new_rank
-        file_dif = old_file - new_file 
-
+    def valid_move(self, _move):
         if self.code.isupper():
 
-            if 0 <= rank_dif <= 2 and file_dif == 0:
+            if 0 <= _move.rank_dif <= 2 and _move.file_dif == 0:
                 return True
             
-            if rank_dif == 1 and -1 <= file_dif <= 1:
+            if _move.rank_dif == 1 and -1 <= _move.file_dif <= 1:
                 return True
         
         else:
-            if -2 <= rank_dif <= 0 and file_dif == 0:
+            if -2 <= _move.rank_dif <= 0 and _move.file_dif == 0:
                 return True
             
-            if rank_dif == -1 and -1 <= file_dif <= 1:
+            if _move.rank_dif == -1 and -1 <= _move.file_dif <= 1:
                 return True
 
         return False

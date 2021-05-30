@@ -1,25 +1,25 @@
 from chess_model.pieces import King, Queen, Rook, Bishop, Knight, Pawn
-
+from chess_model.move import Move
 
 class Model:
     def __init__(self, fen) -> None:
-
-
+        
+        self.fen_piece_codes = {"k": King, "q": Queen, "r": Rook, "b": Bishop, "n": Knight, "p": Pawn}
+        
         self.ranks = 8
         self.files = 8
 
         # game state
         self.turn = "w"
         self.board = [[None for _ in range(self.files)] for _ in range (self.ranks)]
-
-        self.fen_piece_codes = {"k": King, "q": Queen, "r": Rook, "b": Bishop, "n": Knight, "p": Pawn}
-
+        
+        #   populate board
         file_num = 0
         rank_num = 0
 
         for char in fen:
-            
             piece_class = self.fen_piece_codes.get(char.lower())
+
             if piece_class:
                 piece = piece_class(char, file_num, rank_num)
                 self.board[rank_num][file_num] = piece
@@ -31,11 +31,11 @@ class Model:
             elif char == "/":
                 rank_num += 1
                 file_num = 0
-            
             else:
                 break
 
     def __str__ (self) -> str:
+
         fen = ""
         empty_num = 0
 
@@ -59,38 +59,44 @@ class Model:
         return fen
 
     def move(self, old, new) -> None:
-        old_rank, old_file = old
-        piece = self.board[old_rank][old_file]
-        if piece:
-            if piece.valid_move(old, new):
-                if self.valid_move(old, new):
-                    self.board [old_rank][old_file] = None
+        
+        _move = Move(old, new, self.board)
+
+        if _move.old_piece:
+            if _move.old_piece.valid_move(_move):
+                if self.valid_move(_move):
+                    self.board [_move.old_rank][_move.old_file] = None
 
                     new_rank, new_file = new
-                    self.board [new_rank][new_file] = piece
+                    self.board [new_rank][new_file] = _move.old_piece
 
                     self.turn = "b" if self.turn == "w" else "w"
 
-    def valid_move(self, old, new) -> bool:
-        return  self.check_turn(old, new) and \
-                self.check_friendly_capture(old, new) 
+    def valid_move(self, _move) -> bool:
+
+        if type(_move.old_piece) == Pawn:
+            if not self.check_pawn_capture(_move):
+                return False
+            if not self.check_pawn_forward_move(_move):
+                return False
+
+        return  self.check_turn(_move) and \
+                self.check_friendly_capture(_move)
                 
-    def check_turn (self, old, new):
-        old_rank, old_file = old
-        old_piece_colour = self.board[old_rank][old_file].get_colour()
+    def check_turn (self, _move):
+        return _move.old_piece_colour == self.turn
 
-        return old_piece_colour == self.turn
-
-    def check_friendly_capture(self, old, new) -> bool:
-        
-        new_rank, new_file = new
-        new_piece = self.board[new_rank][new_file]
-        if not new_piece:
+    def check_friendly_capture(self, _move) -> bool:
+        if not _move.new_piece:
             return True
+        return _move.old_piece_colour != _move.new_piece_colour
 
-        new_piece_colour = new_piece.get_colour()
+    def check_pawn_capture(self, _move) -> bool:
+        if abs(_move.rank_dif) == 1 and abs(_move.file_dif) == 1:
+            return self.board[_move.new_rank][_move.new_file]
 
-        old_rank, old_file = old
-        old_piece_colour = self.board[old_rank][old_file].get_colour()
+        return True
     
-        return old_piece_colour != new_piece_colour
+    def check_pawn_forward_move(self, move) -> bool:
+        return True
+
