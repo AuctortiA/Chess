@@ -11,7 +11,7 @@ class Window:
         self.canvas = canvas
         
         # game state
-        self.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        self.fen = str(model) # get fen
         
         # window state
         self.scale = scale
@@ -55,7 +55,8 @@ class Window:
                     new_file = math.floor(x / self.scale)
                     new_rank = math.floor(y / self.scale)
 
-                    self.model.move(self.piece_dragged, (new_file, new_rank))
+                    #self.model.move(self.piece_dragged, (new_file, new_rank))
+                    self.piece_dragged = False
 
         
     def loop(self):
@@ -65,6 +66,8 @@ class Window:
         self.handle_events()
 
         # render
+        self.fen = str(self.model)
+
         if self.piece_dragged:
             pos = pg.mouse.get_pos()
             self.canvas.render(self.win, self.fen, self.piece_dragged, pos)
@@ -73,5 +76,5 @@ class Window:
 
 
         # pygame objects
-        self.clock.tick(60)
+        self.clock.tick(165)
         pg.display.update()

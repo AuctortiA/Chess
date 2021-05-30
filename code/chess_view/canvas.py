@@ -10,11 +10,11 @@ class Canvas:
         self.ranks = 8
         self.files = 8
 
-        self.square_rects = [[] for _ in range(self.files)]
+        self.square_rects = [[] for _ in range(self.ranks)]
 
-        for file in range(self.files):
-            for rank in range(self.ranks):
-                self.square_rects[file].append(pg.Rect(file * self.scale, rank * self.scale, self.scale, self.scale))
+        for rank in range(self.ranks):
+            for file in range(self.files):
+                self.square_rects[rank].append(pg.Rect(file * self.scale, rank * self.scale, self.scale, self.scale))
 
         # pieces 
         self.piece_imgs = {}
@@ -46,10 +46,10 @@ class Canvas:
         LIGHT_SQUARE = (240,217,181)
         DARK_SQUARE = (181,136,99)
 
-        for file in range(self.files):
-            for rank in range(self.ranks):
+        for rank in range(self.ranks):
+            for file in range(self.files):
                 colour = LIGHT_SQUARE if (rank + file) % 2 == 0 else DARK_SQUARE
-                pg.draw.rect(win, colour, self.square_rects[file][rank])
+                pg.draw.rect(win, colour, self.square_rects[rank][file])
 
     def render_pieces(self, win, fen, dragged_piece, dragged_pos):
         
@@ -62,11 +62,11 @@ class Canvas:
                     d_file, d_rank = dragged_piece
 
                     if d_file == file_num and d_rank == rank_num:
-                        self.render_piece (win, file_num, rank_num, char, dragged_pos)
+                        self.render_piece (win, rank_num, file_num, char, dragged_pos)
                     else:
-                        self.render_piece(win, file_num, rank_num, char)
+                        self.render_piece(win, rank_num, file_num, char)
                 else:
-                    self.render_piece(win, file_num, rank_num, char)
+                    self.render_piece(win, rank_num, file_num, char)
 
                 file_num += 1
 
@@ -80,13 +80,13 @@ class Canvas:
             else:
                 break
 
-    def render_piece(self, win, file, rank, piece, dragged_pos=None):
+    def render_piece(self, win, rank, file, piece, dragged_pos=None):
         if dragged_pos:
             drag_rect = pg.Rect(dragged_pos, (self.scale, self.scale))
             drag_rect.center = dragged_pos
             win.blit(self.piece_imgs[piece], drag_rect)
         else:
-            win.blit(self.piece_imgs[piece], self.square_rects[file][rank])
+            win.blit(self.piece_imgs[piece], self.square_rects[rank][file])
 
 
 def add_pg_img (_dict, img_name, path, scale):
