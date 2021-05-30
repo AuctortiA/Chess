@@ -43,19 +43,19 @@ class Window:
                 if not self.piece_dragged:
                     x, y = pg.mouse.get_pos()
 
-                    file = math.floor(x / self.scale)
                     rank = math.floor(y / self.scale)
+                    file = math.floor(x / self.scale)
 
-                    self.piece_dragged = (file, rank)
+                    self.piece_dragged = (rank, file)
 
             elif event.type == pg.MOUSEBUTTONUP:
                 if self.piece_dragged:
                     x, y = pg.mouse.get_pos()
 
-                    new_file = math.floor(x / self.scale)
                     new_rank = math.floor(y / self.scale)
+                    new_file = math.floor(x / self.scale)
 
-                    #self.model.move(self.piece_dragged, (new_file, new_rank))
+                    self.model.move(self.piece_dragged, (new_rank, new_file))
                     self.piece_dragged = False
 
         
