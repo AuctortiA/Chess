@@ -12,8 +12,8 @@ class Model:
 
         # game state
         self.turn = "w"
-        self.board = self.populate_board()
-        self.valid_moves = self.get_valid_moves()
+        self.board = self.populate_board(fen)
+        self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares()
 
     def __str__ (self) -> str:
 
@@ -50,7 +50,7 @@ class Model:
 
             if piece_class:
                 piece = piece_class(char, file_num, rank_num)
-                self.board[rank_num][file_num] = piece
+                board[rank_num][file_num] = piece
                 file_num += 1
 
             elif char.isdigit():
@@ -63,6 +63,64 @@ class Model:
                 break
 
         return board
+    
+    def get_controlled_squares (self):
+        w_controlled_squares = set()
+        b_controlled_squares = set()
+
+        for rank in self.board:
+            for piece in rank:
+                if piece:
+                    if type(piece) in [Queen, Bishop]:
+                        # diagonal
+                        #   north-east, south-east, south-west, north-west
+                        directions = [ [-1, 1],  [1, 1], [1, -1], [-1, -1] ]
+
+                        if piece.get_colour() == "w":
+                            w_controlled_squares = self.check_directions(piece, directions, w_controlled_squares)
+                        else:
+                            b_controlled_squares = self.check_directions(piece, directions, b_controlled_squares)
+                    
+                    if type(piece) in [Queen, Rook]:
+                        # vertical / horizontal
+                        #   north, east, south, west
+                        directions = [ [-1, 0], [0, 1], [1, 0], [0, -1] ]
+
+                        if piece.get_colour() == "w":
+                            w_controlled_squares = self.check_directions(piece, directions, w_controlled_squares)
+                        else:
+                            b_controlled_squares = self.check_directions(piece, directions, b_controlled_squares)
+                    
+                    if type(piece) is Pawn:
+                        if piece.get_colour() == "w":
+                            w_controlled_squares.add( (piece.rank - 1, piece.file + 1) )
+                            w_controlled_squares.add( (piece.rank - 1, piece.file - 1) )
+                        else:
+                            b_controlled_squares.add( (piece.rank + 1, piece.file + 1) )
+                            b_controlled_squares.add( (piece.rank + 1, piece.file - 1) )
+
+        return w_controlled_squares, b_controlled_squares
+    
+    def check_directions (self, piece, directions, controlled_squares):
+        for direction in directions:
+            rank_offset, file_offset = direction
+
+            check_rank = piece.rank + rank_offset
+            check_file = piece.file + file_offset
+
+            while 0 <= check_rank < self.ranks and 0 <= check_file < self.ranks:
+                
+                check_piece = self.board[check_rank][check_file]
+                
+                controlled_squares.add((check_rank, check_file))
+                
+                if check_piece:
+                    break
+
+                check_rank += rank_offset
+                check_file += file_offset
+
+        return controlled_squares
 
     def move(self, old, new) -> None:
         
@@ -78,15 +136,15 @@ class Model:
                     self.board [new_rank][new_file] = _move.old_piece
 
                     # update piece
-                    _move.old_piece.rank, _move.old_piece.piece = new
+                    _move.old_piece.rank, _move.old_piece.file = new
 
                     # update game state
                     self.turn = "b" if self.turn == "w" else "w"
 
-    def update_valid_moves (self):
-        
-
-
+                    self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares()
+                    print(self.w_controlled_squares)
+                    print("")
+                    print(self.b_controlled_squares)
 
     def valid_move(self, _move) -> bool:
 
@@ -197,7 +255,8 @@ class Model:
         for rank in self.board:
             for piece in rank:
                 if type(piece) is King:
-                    
+                    pass
+        return True
 
     
     def check_moving_into_check(self, _move) -> bool:

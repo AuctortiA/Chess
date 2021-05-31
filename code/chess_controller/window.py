@@ -77,7 +77,7 @@ class Window:
                 pos = pg.mouse.get_pos()
                 self.canvas.render(self.win, self.fen, self.piece_dragged, pos)
             else:
-                self.canvas.render(self.win, self.fen)
+                self.canvas.render(self.win, self.fen, w_controlled_squares=self.model.w_controlled_squares)
         
         self.changes = False
 

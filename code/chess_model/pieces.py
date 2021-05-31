@@ -20,7 +20,7 @@ class King (Piece):
 
     def valid_move(self, _move):
         return -1 <= _move.rank_dif <= 1 and -1 <= _move.file_dif <= 1
-        
+    
 
 class Queen (Piece):
     def __init__(self, code, file, rank) -> bool:

@@ -35,21 +35,26 @@ class Canvas:
         self.piece_names = self.piece_imgs.keys()
 
         
-    def render(self, win, fen, dragged_piece=None, dragged_pos=None):
+    def render(self, win, fen, dragged_piece=None, dragged_pos=None, w_controlled_squares=[]):
         
         # board
-        self.render_board(win)
+        self.render_board(win, w_controlled_squares)
 
         # pieces
         self.render_pieces(win, fen, dragged_piece, dragged_pos)
 
-    def render_board(self, win): 
+    def render_board(self, win, w_controlled_squares): 
+        
         LIGHT_SQUARE = (240,217,181)
         DARK_SQUARE = (181,136,99)
 
         for rank in range(self.ranks):
             for file in range(self.files):
                 colour = LIGHT_SQUARE if (rank + file) % 2 == 0 else DARK_SQUARE
+
+                if (rank, file) in w_controlled_squares:
+                    colour = (100, 0, 0)
+
                 pg.draw.rect(win, colour, self.square_rects[rank][file])
 
     def render_pieces(self, win, fen, dragged_piece, dragged_pos):
