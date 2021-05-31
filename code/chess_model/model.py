@@ -65,6 +65,8 @@ class Model:
         return board
     
     def get_controlled_squares (self):
+
+        # idea go back and add the piece names again, then can remove negative numbers when loooping through to separate colours.
         w_controlled_squares = set()
         b_controlled_squares = set()
 
@@ -98,6 +100,21 @@ class Model:
                         else:
                             b_controlled_squares.add( (piece.rank + 1, piece.file + 1) )
                             b_controlled_squares.add( (piece.rank + 1, piece.file - 1) )
+
+                    if type(piece) is King:
+                        for rank_offset in range(-1, 2):
+                            for file_offset in range (-1, 2):
+                                if piece.get_colour() == "w":
+                                    w_controlled_squares.add ( (piece.rank + rank_offset, piece.file + file_offset) )
+                                else:
+                                    b_controlled_squares.add ( (piece.rank + rank_offset, piece.file + file_offset) )
+
+                    if type(piece) is Knight:
+                        for rank_offset, file_offset in [ [1, 2], [1, -2], [-1, 2], [-1, -2], [2, 1], [2, -1], [-2, 1], [-2, -1] ]:
+                            if piece.get_colour() == "w":
+                                w_controlled_squares.add ( (piece.rank + rank_offset, piece.file + file_offset) )
+                            else:
+                                b_controlled_squares.add ( (piece.rank + rank_offset, piece.file + file_offset) )
 
         return w_controlled_squares, b_controlled_squares
     
