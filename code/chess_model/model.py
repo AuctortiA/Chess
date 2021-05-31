@@ -75,7 +75,7 @@ class Model:
 
     def valid_move(self, _move) -> bool:
 
-        if type(_move.old_piece) == Pawn:
+        if type(_move.old_piece) is Pawn:
             if not self.check_pawn_capture(_move):
                 return False
             
@@ -86,7 +86,8 @@ class Model:
                 return False
 
         return  self.check_turn(_move) and \
-                self.check_friendly_capture(_move)
+                self.check_friendly_capture(_move) and \
+                self.check_blocking_pieces(_move)
                 
     def check_turn (self, _move):
         return _move.old_piece_colour == self.turn
@@ -95,6 +96,36 @@ class Model:
         if not _move.new_piece:
             return True
         return _move.old_piece_colour != _move.new_piece_colour
+
+    def check_blocking_pieces(self, _move) -> bool:
+        if not type(_move.old_piece) is Knight:
+            
+            # diagonal
+            if abs(_move.rank_dif) == abs(_move.file_dif):
+                if _move.rank_dif > 0:
+                    if _move.file_dif < 0:
+                        # north-east
+                        for square_dif in range(1, abs(_move.rank_dif)):
+                            if self.board[_move.old_rank - square_dif][_move.old_file + square_dif]:
+                                return False
+                    else:
+                        # north-west
+                        for square_dif in range(1, abs(_move.rank_dif)):
+                            if self.board[_move.old_rank - square_dif][_move.old_file - square_dif]:
+                                return False
+                else:
+                    if _move.file_dif < 0:
+                        # south-east
+                        for square_dif in range(1, abs(_move.rank_dif)):
+                            if self.board[_move.old_rank + square_dif][_move.old_file + square_dif]:
+                                return False
+                    else:
+                        # south-west
+                        for square_dif in range(1, abs(_move.rank_dif)):
+                            if self.board[_move.old_rank + square_dif][_move.old_file - square_dif]:
+                                return False
+            
+        return True
 
     def check_pawn_capture(self, _move) -> bool:
         if abs(_move.rank_dif) == 1 and abs(_move.file_dif) == 1:
