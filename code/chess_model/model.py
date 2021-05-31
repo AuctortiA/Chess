@@ -12,28 +12,8 @@ class Model:
 
         # game state
         self.turn = "w"
-        self.board = [[None for _ in range(self.files)] for _ in range (self.ranks)]
-        
-        #   populate board
-        file_num = 0
-        rank_num = 0
-
-        for char in fen:
-            piece_class = self.fen_piece_codes.get(char.lower())
-
-            if piece_class:
-                piece = piece_class(char, file_num, rank_num)
-                self.board[rank_num][file_num] = piece
-                file_num += 1
-
-            elif char.isdigit():
-                file_num += int(char)
-            
-            elif char == "/":
-                rank_num += 1
-                file_num = 0
-            else:
-                break
+        self.board = self.populate_board()
+        self.valid_moves = self.get_valid_moves()
 
     def __str__ (self) -> str:
 
@@ -59,6 +39,31 @@ class Model:
 
         return fen
 
+    def populate_board (self, fen):
+        #   populate board
+        file_num = 0
+        rank_num = 0
+
+        board = [[None for _ in range(self.files)] for _ in range (self.ranks)]
+        for char in fen:
+            piece_class = self.fen_piece_codes.get(char.lower())
+
+            if piece_class:
+                piece = piece_class(char, file_num, rank_num)
+                self.board[rank_num][file_num] = piece
+                file_num += 1
+
+            elif char.isdigit():
+                file_num += int(char)
+            
+            elif char == "/":
+                rank_num += 1
+                file_num = 0
+            else:
+                break
+
+        return board
+
     def move(self, old, new) -> None:
         
         _move = Move(old, new, self.board)
@@ -66,14 +71,27 @@ class Model:
         if _move.old_piece:
             if _move.old_piece.valid_move(_move):
                 if self.valid_move(_move):
+                    
+                    # update board
                     self.board [_move.old_rank][_move.old_file] = None
-
                     new_rank, new_file = new
                     self.board [new_rank][new_file] = _move.old_piece
 
+                    # update piece
+                    _move.old_piece.rank, _move.old_piece.piece = new
+
+                    # update game state
                     self.turn = "b" if self.turn == "w" else "w"
 
+    def update_valid_moves (self):
+        
+
+
+
     def valid_move(self, _move) -> bool:
+
+        if type(_move.old_piece) is King:
+            self.check_moving_into_check
 
         if type(_move.old_piece) is Pawn:
             if not self.check_pawn_capture(_move):
@@ -87,7 +105,8 @@ class Model:
 
         return  self.check_turn(_move) and \
                 self.check_friendly_capture(_move) and \
-                self.check_blocking_pieces(_move)
+                self.check_blocking_pieces(_move) and \
+                self.check_in_check(_move) 
                 
     def check_turn (self, _move):
         return _move.old_piece_colour == self.turn
@@ -173,3 +192,13 @@ class Model:
                 return False
         return True
 
+    def check_in_check(self, _move) -> bool:
+        # get kings
+        for rank in self.board:
+            for piece in rank:
+                if type(piece) is King:
+                    
+
+    
+    def check_moving_into_check(self, _move) -> bool:
+        return True
