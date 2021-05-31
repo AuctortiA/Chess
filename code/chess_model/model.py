@@ -102,8 +102,8 @@ class Model:
             
             # diagonal
             if abs(_move.rank_dif) == abs(_move.file_dif):
-                if _move.rank_dif > 0:
-                    if _move.file_dif < 0:
+                if _move.rank_dif < 0:
+                    if _move.file_dif > 0:
                         # north-east
                         for square_dif in range(1, abs(_move.rank_dif)):
                             if self.board[_move.old_rank - square_dif][_move.old_file + square_dif]:
@@ -114,7 +114,7 @@ class Model:
                             if self.board[_move.old_rank - square_dif][_move.old_file - square_dif]:
                                 return False
                 else:
-                    if _move.file_dif < 0:
+                    if _move.file_dif > 0:
                         # south-east
                         for square_dif in range(1, abs(_move.rank_dif)):
                             if self.board[_move.old_rank + square_dif][_move.old_file + square_dif]:
@@ -124,7 +124,32 @@ class Model:
                         for square_dif in range(1, abs(_move.rank_dif)):
                             if self.board[_move.old_rank + square_dif][_move.old_file - square_dif]:
                                 return False
-            
+                    
+            # vertical & horizontal
+            if (_move.rank_dif != 0 and _move.file_dif == 0) or (_move.rank_dif == 0 and _move.file_dif != 0):
+                if _move.rank_dif < 0:
+                    # north
+                    for square_dif in range(1, abs(_move.rank_dif)):
+                        if self.board[_move.old_rank - square_dif][_move.old_file]:
+                            return False
+
+                elif _move.rank_dif > 0:
+                    # south
+                    for square_dif in range(1, abs(_move.rank_dif)):
+                        if self.board[_move.old_rank + square_dif][_move.old_file]:
+                            return False
+
+                elif _move.file_dif > 0:
+                    # east
+                    for square_dif in range(1, abs(_move.file_dif)):
+                        if self.board[_move.old_rank][_move.old_file + square_dif]:
+                            return False
+
+                else:
+                    # west
+                    for square_dif in range(1, abs(_move.file_dif)):
+                        if self.board[_move.old_rank][_move.old_file - square_dif]:
+                            return False
         return True
 
     def check_pawn_capture(self, _move) -> bool:

@@ -78,18 +78,15 @@ class Pawn (Piece):
 
     def valid_move(self, _move):
         if self.code.isupper():
-
-            if 0 <= _move.rank_dif <= 2 and _move.file_dif == 0:
-                return True
-            
-            if _move.rank_dif == 1 and -1 <= _move.file_dif <= 1:
-                return True
-        
-        else:
             if -2 <= _move.rank_dif <= 0 and _move.file_dif == 0:
                 return True
             
             if _move.rank_dif == -1 and -1 <= _move.file_dif <= 1:
                 return True
-
+        else:
+            if 0 <= _move.rank_dif <= 2 and _move.file_dif == 0:
+                return True
+            
+            if _move.rank_dif == 1 and -1 <= _move.file_dif <= 1:
+                return True
         return False

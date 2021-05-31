@@ -17,5 +17,5 @@ class Move:
         else:
             self.new_piece_colour = None
 
-        self.rank_dif = self.old_rank - self.new_rank
-        self.file_dif = self.old_file - self.new_file 
+        self.rank_dif = self.new_rank - self.old_rank
+        self.file_dif = self.new_file - self.old_file
