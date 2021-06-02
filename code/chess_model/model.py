@@ -12,8 +12,12 @@ class Model:
         self.files = 8
 
         # game state
-        self.turn = "w"
         self.board = self.populate_board(fen)
+
+        self.turn = self.get_turn(fen)
+        self.en_passant = self.get_en_passant(fen)
+
+        
         self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
 
     def __str__ (self) -> str:
@@ -21,6 +25,7 @@ class Model:
         fen = ""
         empty_num = 0
 
+        # board
         for rank in self.board:
             for square in rank:
                 if square:
@@ -36,11 +41,28 @@ class Model:
             
             fen += "/"
             empty_num = 0
+        
+        fen += " "
+
+        # turn
+        fen += self.turn
+        fen += " "
+
+        # castling
+
+        #fen += " "
+
+        # en passant
+        if self.en_passant:
+            fen += self.en_passant
+        else:
+            fen += "-"
+        fen += " "
 
         return fen
 
     def populate_board (self, fen):
-        
+
         #   populate board
         file_num = 0
         rank_num = 0
@@ -65,6 +87,21 @@ class Model:
 
         return board
     
+    def get_turn(self, fen):
+        return fen.split()[1]
+
+    def get_en_passant(self, fen):
+        en_passant = fen.split()[3]
+
+        if en_passant != "-":
+            return en_passant
+
+    def to_rf(self, code):
+        return int(code[1]) - 1, ord(code[0]) - 97
+    
+    def from_rf(self, rank, file):
+        return f'{chr(file+97)}{int(rank + 1)}'
+
     def get_controlled_squares (self, board):
 
         # idea go back and add the piece names again, then can remove negative numbers when loooping through to separate colours.
@@ -155,17 +192,40 @@ class Model:
                     _move.old_piece.rank, _move.old_piece.file = new
 
                     # update game state
+                    #   turn
                     self.turn = "b" if self.turn == "w" else "w"
+                    
+                    #   castling
+                    
+                    #   en passant
+
+                    if self.en_passant:
+                        self.en_passant = None
+
+                    if _move.type is Pawn:
+                        if abs(_move.rank_dif) == 2:
+                            if  type(self.board [_move.new_rank][_move.new_file + 1]) is Pawn or \
+                                type(self.board [_move.new_rank][_move.new_file - 1]) is Pawn:
+                                self.en_passant = self.from_rf(_move.new_rank - (_move.rank_dif / 2), _move.new_file)
+
+                    print(self.en_passant)
+                    #   controlled_squares
                     self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
 
     def get_board_move(self, board, _move):
+        
+        #   en passant
+        if self.en_passant and _move.type is Pawn:
+            if (_move.new_rank, _move.new_file) == self.to_rf(self.en_passant):
+                board [_move.old_rank][_move.new_file] = None
+
         board [_move.old_rank][_move.old_file] = None
         board [_move.new_rank][_move.new_file] = _move.old_piece
         return board
 
     def valid_move(self, _move) -> bool:
 
-        if type(_move.old_piece) is Pawn:
+        if _move.type is Pawn:
             if not self.check_pawn_capture(_move):
                 return False
             
@@ -189,7 +249,7 @@ class Model:
         return _move.old_piece_colour != _move.new_piece_colour
 
     def check_blocking_pieces(self, _move) -> bool:
-        if not type(_move.old_piece) is Knight:
+        if not _move.type is Knight:
             
             # diagonal
             if abs(_move.rank_dif) == abs(_move.file_dif):
@@ -244,8 +304,13 @@ class Model:
         return True
 
     def check_pawn_capture(self, _move) -> bool:
+
         if abs(_move.rank_dif) == 1 and abs(_move.file_dif) == 1:
+            if self.en_passant:
+                if (_move.new_rank, _move.new_file) == self.to_rf(self.en_passant):
+                    return True
             return self.board[_move.new_rank][_move.new_file]
+
         return True
     
     def check_pawn_two_square_rule(self, _move) -> bool:
