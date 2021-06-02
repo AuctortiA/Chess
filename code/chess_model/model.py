@@ -1,6 +1,7 @@
 from chess_model.pieces import King, Queen, Rook, Bishop, Knight, Pawn
 from chess_model.move import Move
 
+from copy import deepcopy
 
 class Model:
     def __init__(self, fen) -> None:
@@ -13,7 +14,7 @@ class Model:
         # game state
         self.turn = "w"
         self.board = self.populate_board(fen)
-        self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares()
+        self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
 
     def __str__ (self) -> str:
 
@@ -26,7 +27,6 @@ class Model:
                     if empty_num != 0:
                         fen += str(empty_num)
                         empty_num = 0
-
                     fen += str(square)
                 else:
                     empty_num += 1
@@ -40,6 +40,7 @@ class Model:
         return fen
 
     def populate_board (self, fen):
+        
         #   populate board
         file_num = 0
         rank_num = 0
@@ -64,13 +65,13 @@ class Model:
 
         return board
     
-    def get_controlled_squares (self):
+    def get_controlled_squares (self, board):
 
         # idea go back and add the piece names again, then can remove negative numbers when loooping through to separate colours.
         w_controlled_squares = set()
         b_controlled_squares = set()
 
-        for rank in self.board:
+        for rank in board:
             for piece in rank:
                 if piece:
                     if type(piece) in [Queen, Bishop]:
@@ -79,9 +80,9 @@ class Model:
                         directions = [ [-1, 1],  [1, 1], [1, -1], [-1, -1] ]
 
                         if piece.get_colour() == "w":
-                            w_controlled_squares = self.check_directions(piece, directions, w_controlled_squares)
+                            w_controlled_squares = self.check_directions(board, piece, directions, w_controlled_squares)
                         else:
-                            b_controlled_squares = self.check_directions(piece, directions, b_controlled_squares)
+                            b_controlled_squares = self.check_directions(board, piece, directions, b_controlled_squares)
                     
                     if type(piece) in [Queen, Rook]:
                         # vertical / horizontal
@@ -89,9 +90,9 @@ class Model:
                         directions = [ [-1, 0], [0, 1], [1, 0], [0, -1] ]
 
                         if piece.get_colour() == "w":
-                            w_controlled_squares = self.check_directions(piece, directions, w_controlled_squares)
+                            w_controlled_squares = self.check_directions(board, piece, directions, w_controlled_squares)
                         else:
-                            b_controlled_squares = self.check_directions(piece, directions, b_controlled_squares)
+                            b_controlled_squares = self.check_directions(board, piece, directions, b_controlled_squares)
                     
                     if type(piece) is Pawn:
                         if piece.get_colour() == "w":
@@ -118,7 +119,7 @@ class Model:
 
         return w_controlled_squares, b_controlled_squares
     
-    def check_directions (self, piece, directions, controlled_squares):
+    def check_directions (self, board, piece, directions, controlled_squares):
         for direction in directions:
             rank_offset, file_offset = direction
 
@@ -127,7 +128,7 @@ class Model:
 
             while 0 <= check_rank < self.ranks and 0 <= check_file < self.ranks:
                 
-                check_piece = self.board[check_rank][check_file]
+                check_piece = board[check_rank][check_file]
                 
                 controlled_squares.add((check_rank, check_file))
                 
@@ -148,25 +149,21 @@ class Model:
                 if self.valid_move(_move):
                     
                     # update board
-                    self.board [_move.old_rank][_move.old_file] = None
-                    new_rank, new_file = new
-                    self.board [new_rank][new_file] = _move.old_piece
+                    self.board = self.get_board_move(self.board, _move)
 
                     # update piece
                     _move.old_piece.rank, _move.old_piece.file = new
 
                     # update game state
                     self.turn = "b" if self.turn == "w" else "w"
+                    self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
 
-                    self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares()
-                    print(self.w_controlled_squares)
-                    print("")
-                    print(self.b_controlled_squares)
+    def get_board_move(self, board, _move):
+        board [_move.old_rank][_move.old_file] = None
+        board [_move.new_rank][_move.new_file] = _move.old_piece
+        return board
 
     def valid_move(self, _move) -> bool:
-
-        if type(_move.old_piece) is King:
-            self.check_moving_into_check
 
         if type(_move.old_piece) is Pawn:
             if not self.check_pawn_capture(_move):
@@ -181,7 +178,7 @@ class Model:
         return  self.check_turn(_move) and \
                 self.check_friendly_capture(_move) and \
                 self.check_blocking_pieces(_move) and \
-                self.check_in_check(_move) 
+                self.check_king_checks(_move) 
                 
     def check_turn (self, _move):
         return _move.old_piece_colour == self.turn
@@ -267,14 +264,20 @@ class Model:
                 return False
         return True
 
-    def check_in_check(self, _move) -> bool:
+    def check_king_checks(self, _move) -> bool:
+        
+        # get proposed move
+        proposed_board = self.get_board_move(deepcopy(self.board), _move)
+        w_proposed_controlled_squares, b_proposed_controlled_squares = self.get_controlled_squares(proposed_board)
+        
         # get kings
         for rank in self.board:
             for piece in rank:
                 if type(piece) is King:
-                    pass
-        return True
-
-    
-    def check_moving_into_check(self, _move) -> bool:
+                    if piece.get_colour() == "w" and _move.old_piece.get_colour() == "w":
+                        if (piece.rank, piece.file) in b_proposed_controlled_squares:
+                            return False
+                    elif piece.get_colour() == "b" and _move.old_piece.get_colour() == "b":
+                        if (piece.rank, piece.file) in w_proposed_controlled_squares:
+                            return False
         return True
