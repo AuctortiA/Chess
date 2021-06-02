@@ -339,10 +339,25 @@ class Model:
         for rank in self.board:
             for piece in rank:
                 if type(piece) is King:
-                    if piece.get_colour() == "w" and _move.old_piece.get_colour() == "w":
-                        if (piece.rank, piece.file) in b_proposed_controlled_squares:
-                            return False
-                    elif piece.get_colour() == "b" and _move.old_piece.get_colour() == "b":
-                        if (piece.rank, piece.file) in w_proposed_controlled_squares:
-                            return False
+
+                    if _move.old_piece_colour == "w":
+
+                        if _move.type is King:
+                            if (_move.new_rank, _move.new_file) in b_proposed_controlled_squares:
+                                return False
+
+                        else:
+                            if piece.get_colour() == "w":
+                                if (piece.rank, piece.file) in b_proposed_controlled_squares:
+                                    return False
+                    
+                    else:
+                        if _move.type is King:
+                            if (_move.new_rank, _move.new_file) in w_proposed_controlled_squares:
+                                return False
+                        else:
+                            if piece.get_colour() == "b":
+                                if (piece.rank, piece.file) in w_proposed_controlled_squares:
+                                    return False
+                            
         return True
