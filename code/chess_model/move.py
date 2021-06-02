@@ -13,6 +13,8 @@ class Move:
         self.rank_dif = self.new_rank - self.old_rank
         self.file_dif = self.new_file - self.old_file
 
+        self.type = self.__get_type()
+
     def __get_old_colour(self):
         if self.old_piece:
             return self.old_piece.get_colour()
@@ -20,3 +22,7 @@ class Move:
     def __get_new_colour(self):
         if self.new_piece:
             return self.new_piece.get_colour()
+        
+    def __get_type(self):
+        if self.old_piece:
+            return type(self.old_piece)
