@@ -7,7 +7,11 @@ class Piece:
 
     def __str__(self):
         return self.code
-
+    
+    def __iter__(self):
+        yield self.file
+        yield self.rank
+        
     def valid_move(self, _move):
         return True
 
