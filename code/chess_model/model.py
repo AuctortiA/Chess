@@ -211,35 +211,41 @@ class Model:
                     self.turn = "b" if self.turn == "w" else "w"
                     
                     #   castling
-                    if _move.old == (0, 0):
-                        self.castling = self.castling.replace("q", "")
-                    elif _move.old == (0, self.files - 1):
-                        self.castling = self.castling.replace("k", "")
-                    elif _move.old == (self.ranks - 1, 0):
-                        self.castling = self.castling.replace("Q", "")
-                    elif _move.old == (self.ranks - 1, self.files - 1):
-                        self.castling = self.castling.replace("K", "")
-
-                    if _move.type is King:
-                        if _move.old_piece_colour == "w":
-                            self.castling = self.castling.replace("K", "")
-                            self.castling = self.castling.replace("Q", "")
-                        else:
-                            self.castling = self.castling.replace("k", "")
-                            self.castling = self.castling.replace("q", "")
+                    self.update_castling(_move)
 
                     #   en passant
-                    if self.en_passant:
-                        self.en_passant = None
-
-                    if _move.type is Pawn:
-                        if abs(_move.rank_dif) == 2:
-                            if  type(self.board [_move.new_rank][_move.new_file + 1]) is Pawn or \
-                                type(self.board [_move.new_rank][_move.new_file - 1]) is Pawn:
-                                self.en_passant = self.from_rf(_move.new_rank - (_move.rank_dif / 2), _move.new_file)
+                    self.update_enpassant(_move)
 
                     #   controlled_squares
                     self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
+
+    def update_castling(self, _move):
+        if _move.old == (0, 0):
+            self.castling = self.castling.replace("q", "")
+        elif _move.old == (0, self.files - 1):
+            self.castling = self.castling.replace("k", "")
+        elif _move.old == (self.ranks - 1, 0):
+            self.castling = self.castling.replace("Q", "")
+        elif _move.old == (self.ranks - 1, self.files - 1):
+            self.castling = self.castling.replace("K", "")
+
+        if _move.type is King:
+            if _move.old_piece_colour == "w":
+                self.castling = self.castling.replace("K", "")
+                self.castling = self.castling.replace("Q", "")
+            else:
+                self.castling = self.castling.replace("k", "")
+                self.castling = self.castling.replace("q", "")
+
+    def update_enpassant(self, _move):
+        if self.en_passant:
+            self.en_passant = None
+
+        if _move.type is Pawn:
+            if abs(_move.rank_dif) == 2:
+                if  type(self.board [_move.new_rank][_move.new_file + 1]) is Pawn or \
+                    type(self.board [_move.new_rank][_move.new_file - 1]) is Pawn:
+                    self.en_passant = self.from_rf(_move.new_rank - (_move.rank_dif / 2), _move.new_file)
 
     def get_board_move(self, board, _move):
         
