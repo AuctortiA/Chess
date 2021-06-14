@@ -4,15 +4,16 @@ from chess_model.move import Move
 from copy import deepcopy
 
 class Model:
+    
+    fen_piece_codes = {"k": King, "q": Queen, "r": Rook, "b": Bishop, "n": Knight, "p": Pawn}
+    
     def __init__(self, fen) -> None:
         
-        self.fen_piece_codes = {"k": King, "q": Queen, "r": Rook, "b": Bishop, "n": Knight, "p": Pawn}
-        
-        self.ranks = 8
-        self.files = 8
+        self.ranks = self.get_ranks()
+        self.files = self.get_files()
 
         # game state
-        self.board = self.populate_board(fen)
+        self.board, self.pieces = self.populate_board(fen)
 
         self.turn = self.get_turn(fen)
         self.en_passant = self.get_en_passant(fen)
@@ -61,6 +62,12 @@ class Model:
 
         return fen
 
+    def get_ranks(self, fen):
+        return None
+
+    def get_files(self, fen):
+        return None
+
     def populate_board (self, fen):
 
         #   populate board
@@ -68,12 +75,19 @@ class Model:
         rank_num = 0
 
         board = [[None for _ in range(self.files)] for _ in range (self.ranks)]
+        pieces = {"p": []}
+
         for char in fen:
             piece_class = self.fen_piece_codes.get(char.lower())
 
             if piece_class:
                 piece = piece_class(char, file_num, rank_num)
                 board[rank_num][file_num] = piece
+                if char.lower() == "p":
+                    pieces["p"].append(piece)
+                else:
+                    pieces.update({char: piece})
+
                 file_num += 1
 
             elif char.isdigit():
@@ -85,8 +99,8 @@ class Model:
             else:
                 break
 
-        return board
-    
+        return board, pieces
+
     def get_turn(self, fen):
         return fen.split()[1]
 
@@ -104,7 +118,7 @@ class Model:
 
     def get_controlled_squares (self, board):
 
-        # idea go back and add the piece names again, then can remove negative numbers when loooping through to separate colours.
+        # idea go back and add the piece names again (so dict instead of set), then can remove negative numbers when loooping through to separate colours.
         w_controlled_squares = set()
         b_controlled_squares = set()
 
@@ -156,6 +170,9 @@ class Model:
 
         return w_controlled_squares, b_controlled_squares
     
+    def get_controlled_squares_new(self, board, pieces):
+
+
     def check_directions (self, board, piece, directions, controlled_squares):
         for direction in directions:
             rank_offset, file_offset = direction
@@ -189,7 +206,7 @@ class Model:
                     self.board = self.get_board_move(self.board, _move)
 
                     # update piece
-                    _move.old_piece.rank, _move.old_piece.file = new
+                    _move.old_piece.rank, _move.old_piece.file = _move.new_piece
 
                     # update game state
                     #   turn
@@ -208,7 +225,6 @@ class Model:
                                 type(self.board [_move.new_rank][_move.new_file - 1]) is Pawn:
                                 self.en_passant = self.from_rf(_move.new_rank - (_move.rank_dif / 2), _move.new_file)
 
-                    print(self.en_passant)
                     #   controlled_squares
                     self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
 
