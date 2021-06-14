@@ -9,11 +9,13 @@ class Model:
     
     def __init__(self, fen) -> None:
         
-        self.ranks = self.get_ranks()
-        self.files = self.get_files()
+        self.ranks = self.get_ranks(fen)
+        self.files = self.get_files(fen)
 
         # game state
         self.board, self.pieces = self.populate_board(fen)
+
+        print(self.pieces)
 
         self.turn = self.get_turn(fen)
         self.en_passant = self.get_en_passant(fen)
@@ -63,10 +65,10 @@ class Model:
         return fen
 
     def get_ranks(self, fen):
-        return None
+        return 8
 
     def get_files(self, fen):
-        return None
+        return 8
 
     def populate_board (self, fen):
 
@@ -75,7 +77,7 @@ class Model:
         rank_num = 0
 
         board = [[None for _ in range(self.files)] for _ in range (self.ranks)]
-        pieces = {"p": []}
+        pieces = {"p": [], "P": []}
 
         for char in fen:
             piece_class = self.fen_piece_codes.get(char.lower())
@@ -84,7 +86,7 @@ class Model:
                 piece = piece_class(char, file_num, rank_num)
                 board[rank_num][file_num] = piece
                 if char.lower() == "p":
-                    pieces["p"].append(piece)
+                    pieces[char].append(piece)
                 else:
                     pieces.update({char: piece})
 
@@ -169,9 +171,6 @@ class Model:
                                 b_controlled_squares.add ( (piece.rank + rank_offset, piece.file + file_offset) )
 
         return w_controlled_squares, b_controlled_squares
-    
-    def get_controlled_squares_new(self, board, pieces):
-
 
     def check_directions (self, board, piece, directions, controlled_squares):
         for direction in directions:
@@ -206,7 +205,7 @@ class Model:
                     self.board = self.get_board_move(self.board, _move)
 
                     # update piece
-                    _move.old_piece.rank, _move.old_piece.file = _move.new_piece
+                    _move.old_piece.rank, _move.old_piece.file = _move.new_rank, _move.new_file
 
                     # update game state
                     #   turn
@@ -377,3 +376,31 @@ class Model:
                                     return False
                             
         return True
+
+    def check_king_checks(self, _move) -> bool:
+        
+        # get proposed move
+        proposed_board = self.get_board_move(deepcopy(self.board), _move)
+        w_proposed_controlled_squares, b_proposed_controlled_squares = self.get_controlled_squares(proposed_board)
+        
+        w_king = self.pieces["K"]
+        b_king = self.pieces["k"]
+
+        if self.turn == "w":
+            if _move.type is King:
+                if _move.new in b_proposed_controlled_squares:
+                    return False
+            else:
+                if w_king.get_square() in b_proposed_controlled_squares:
+                    return False
+        
+        else:
+            if _move.type is King:
+                if _move.new in w_proposed_controlled_squares:
+                    return False
+            else:
+                if b_king.get_square() in w_proposed_controlled_squares:
+                    return False
+
+        return True
+        
