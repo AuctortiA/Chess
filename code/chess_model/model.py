@@ -15,9 +15,8 @@ class Model:
         # game state
         self.board, self.pieces = self.populate_board(fen)
 
-        print(self.pieces)
-
         self.turn = self.get_turn(fen)
+        self.castling = "KQkq"
         self.en_passant = self.get_en_passant(fen)
 
         
@@ -212,9 +211,24 @@ class Model:
                     self.turn = "b" if self.turn == "w" else "w"
                     
                     #   castling
-                    
-                    #   en passant
+                    if _move.old == (0, 0):
+                        self.castling = self.castling.replace("q", "")
+                    elif _move.old == (0, self.files - 1):
+                        self.castling = self.castling.replace("k", "")
+                    elif _move.old == (self.ranks - 1, 0):
+                        self.castling = self.castling.replace("Q", "")
+                    elif _move.old == (self.ranks - 1, self.files - 1):
+                        self.castling = self.castling.replace("K", "")
 
+                    if _move.type is King:
+                        if _move.old_piece_colour == "w":
+                            self.castling = self.castling.replace("K", "")
+                            self.castling = self.castling.replace("Q", "")
+                        else:
+                            self.castling = self.castling.replace("k", "")
+                            self.castling = self.castling.replace("q", "")
+
+                    #   en passant
                     if self.en_passant:
                         self.en_passant = None
 
@@ -329,6 +343,7 @@ class Model:
         return True
     
     def check_pawn_two_square_rule(self, _move) -> bool:
+
         if abs(_move.rank_dif) == 2:
             if _move.old_rank == 1 or _move.old_rank == self.ranks - 2:
                 return True
@@ -403,4 +418,6 @@ class Model:
                     return False
 
         return True
-        
+
+    def check_castling(self, _move) -> bool:
+        return True
