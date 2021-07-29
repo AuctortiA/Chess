@@ -20,8 +20,8 @@ class Model:
         self.en_passant = self.get_en_passant(fen)
         self.halfmoves = 0
         self.moves = 1
-
         
+        # controlled squares
         self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
 
     def __str__ (self) -> str:
