@@ -52,8 +52,8 @@ class Canvas:
             for file in range(self.files):
                 colour = LIGHT_SQUARE if (rank + file) % 2 == 0 else DARK_SQUARE
 
-                if (rank, file) in w_controlled_squares:
-                    colour = (100, 0, 0)
+                # if (rank, file) in w_controlled_squares:
+                #     colour = (100, 0, 0)
 
                 pg.draw.rect(win, colour, self.square_rects[rank][file])
 

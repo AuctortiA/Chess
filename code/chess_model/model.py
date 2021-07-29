@@ -220,6 +220,8 @@ class Model:
                     self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
 
     def update_castling(self, _move):
+
+        # castling rights
         if _move.old == (0, 0):
             self.castling = self.castling.replace("q", "")
         elif _move.old == (0, self.files - 1):
@@ -236,6 +238,21 @@ class Model:
             else:
                 self.castling = self.castling.replace("k", "")
                 self.castling = self.castling.replace("q", "")
+
+        # castling move
+        if _move.type is King: 
+            if abs(_move.file_dif) == 2:
+
+                if type(self.board[_move.old_rank][_move.old_file + int(_move.file_dif * 1.5)]) is Rook:
+                    old_rook_square = ( _move.old_rank, _move.old_file + int(_move.file_dif * 1.5) )
+                else:
+                    old_rook_square = ( _move.old_rank, _move.old_file + int(_move.file_dif * 2) )
+
+                new_rook_square = ( _move.old_rank, _move.old_file + int(_move.file_dif / 2) )
+
+
+                rook_move = Move(old_rook_square, new_rook_square, self.board)
+                self.board = self.get_board_move(self.board, rook_move)
 
     def update_enpassant(self, _move):
         if self.en_passant:
@@ -268,6 +285,10 @@ class Model:
                 return False
 
             if not self.check_pawn_forward_move(_move):
+                return False
+
+        if _move.type is King:
+            if not self.check_castling(_move):
                 return False
 
         return  self.check_turn(_move) and \
@@ -426,4 +447,30 @@ class Model:
         return True
 
     def check_castling(self, _move) -> bool:
+        if abs(_move.file_dif) == 2:
+            
+            
+            if _move.old_piece_colour == "w":
+                # white
+                if _move.file_dif > 0:
+                    # king side
+                    if "K" in self.castling:
+                        pass
+                else:
+                    # queen
+                    if "Q" in self.castling:
+                        pass
+            else:
+                # black
+                if _move.file_dif > 0:
+                    # queen side
+                    if "q" in self.castling:
+                        pass
+                else:
+                    # king side
+                    if "k" in self.castling:
+                        pass
+
+
         return True
+

@@ -1,5 +1,8 @@
 class Move:
     def __init__(self, old, new, board) -> None:
+        # change old and new to from and to
+        self.old = old
+        self.new = new
 
         self.old_rank, self.old_file = old
         self.new_rank, self.new_file = new

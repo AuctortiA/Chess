@@ -11,19 +11,22 @@ class Piece:
     def __iter__(self):
         yield self.file
         yield self.rank
-        
+
     def valid_move(self, _move):
         return True
 
     def get_colour (self):
         return "w" if self.code.isupper() else "b"
 
+    def get_square(self):
+        return self.rank, self.file
+
 class King (Piece):
     def __init__(self, code, file, rank) -> bool:
         super().__init__(code, file, rank)
 
     def valid_move(self, _move):
-        return -1 <= _move.rank_dif <= 1 and -1 <= _move.file_dif <= 1
+        return -1 <= _move.rank_dif <= 1 and -2 <= _move.file_dif <= 2
     
 
 class Queen (Piece):
