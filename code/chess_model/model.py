@@ -18,6 +18,8 @@ class Model:
         self.turn = self.get_turn(fen)
         self.castling = "KQkq"
         self.en_passant = self.get_en_passant(fen)
+        self.halfmoves = 0
+        self.moves = 1
 
         
         self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
@@ -51,15 +53,18 @@ class Model:
         fen += " "
 
         # castling
-
-        #fen += " "
+        fen += self.castling
+        fen += " "
 
         # en passant
-        if self.en_passant:
-            fen += self.en_passant
-        else:
-            fen += "-"
+        fen += f'{self.en_passant if self.en_passant else "-"} '
+
+        # halfmove clock
+        fen += self.halfmoves
         fen += " "
+
+        # fullmove number
+        fen += self.moves
 
         return fen
 
@@ -218,6 +223,8 @@ class Model:
 
                     #   controlled_squares
                     self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
+                    
+                    print(self)
 
     def update_castling(self, _move):
 
