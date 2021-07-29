@@ -221,6 +221,16 @@ class Model:
                     #   en passant
                     self.update_enpassant(_move)
 
+                    # half moves
+                    if _move.new_piece or type(_move.old_piece) is Pawn:
+                        self.halfmoves = 0
+                    else:
+                        self.halfmoves += 1
+                        
+                    # moves 
+                    if self.turn == "w":
+                        self.moves += 1
+
                     #   controlled_squares
                     self.w_controlled_squares, self.b_controlled_squares = self.get_controlled_squares(self.board)
                     
