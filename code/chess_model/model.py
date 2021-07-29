@@ -60,11 +60,11 @@ class Model:
         fen += f'{self.en_passant if self.en_passant else "-"} '
 
         # halfmove clock
-        fen += self.halfmoves
+        fen += str(self.halfmoves)
         fen += " "
 
         # fullmove number
-        fen += self.moves
+        fen += str(self.moves)
 
         return fen
 
@@ -262,14 +262,25 @@ class Model:
                 self.board = self.get_board_move(self.board, rook_move)
 
     def update_enpassant(self, _move):
-        if self.en_passant:
-            self.en_passant = None
+        self.en_passant = None if self.en_passant else self.en_passant
 
         if _move.type is Pawn:
             if abs(_move.rank_dif) == 2:
-                if  type(self.board [_move.new_rank][_move.new_file + 1]) is Pawn or \
-                    type(self.board [_move.new_rank][_move.new_file - 1]) is Pawn:
-                    self.en_passant = self.from_rf(_move.new_rank - (_move.rank_dif / 2), _move.new_file)
+                
+                left_piece = self.board [_move.new_rank][_move.new_file + 1]
+                right_piece = self.board [_move.new_rank][_move.new_file - 1]
+
+                # white
+                if _move.old_piece_colour == "w":
+                    if  type(left_piece) is Pawn and left_piece and left_piece.get_colour() == "b" or \
+                        type(right_piece) is Pawn and right_piece and right_piece.get_colour() == "b":
+                        self.en_passant = self.from_rf(_move.new_rank - (_move.rank_dif / 2), _move.new_file)
+
+                # black
+                if _move.old_piece_colour == "b":
+                    if  type(left_piece) is Pawn and left_piece and left_piece.get_colour() == "w" or \
+                        type(right_piece) is Pawn and right_piece and right_piece.get_colour() == "w":
+                        self.en_passant = self.from_rf(_move.new_rank - (_move.rank_dif / 2), _move.new_file)
 
     def get_board_move(self, board, _move):
         
